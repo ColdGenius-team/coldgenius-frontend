@@ -60,3 +60,46 @@ footer {
     background-color: #333;
     color: #fff;
 }
+
+/* Form Styles */
+#emailForm {
+    margin-top: 2rem;
+}
+
+#emailForm label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+#emailForm input[type="text"],
+#emailForm select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#emailForm button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+#emailForm button:hover {
+    background-color: #45a049; /* Darker green */
+}
+
+/* Result Styles */
+#result {
+    margin-top: 2rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+    white-space: pre-wrap; /* Preserve line breaks and spaces */
+}
