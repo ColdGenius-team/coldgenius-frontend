@@ -45,7 +45,11 @@ form.appendChild(toneLabel);
 form.appendChild(toneSelect);
 form.appendChild(submitButton);
 
-document.body.appendChild(form);
+// Get the placeholder div by its ID
+const formContainer = document.getElementById('emailFormContainer');
+
+// Append the form to the placeholder div
+formContainer.appendChild(form);
 
 const resultDiv = document.createElement('div');
 resultDiv.id = 'result';
