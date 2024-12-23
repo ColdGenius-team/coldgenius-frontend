@@ -1,9 +1,11 @@
 const apiKey = "YOUR_API_KEY_HERE"; // Placeholder - Netlify will replace this during deployment
-const apiUrl = "https://api.openai.com/v1/engines/text-davinci-003/completions"; // Use the appropriate endpoint
+const apiUrl = "https://api.openai.com/v1/chat/completions"; // Updated API endpoint
 
+// Create the form element
 const form = document.createElement('form');
 form.id = 'emailForm';
 
+// Create and append form fields
 const companyLabel = document.createElement('label');
 companyLabel.textContent = 'Company Name:';
 const companyInput = document.createElement('input');
@@ -37,6 +39,7 @@ const submitButton = document.createElement('button');
 submitButton.type = 'submit';
 submitButton.textContent = 'Generate Email';
 
+// Append elements to the form
 form.appendChild(companyLabel);
 form.appendChild(companyInput);
 form.appendChild(productLabel);
@@ -45,34 +48,44 @@ form.appendChild(toneLabel);
 form.appendChild(toneSelect);
 form.appendChild(submitButton);
 
-// Get the placeholder div by its ID
+// Get the placeholder div by its ID and append the form
 const formContainer = document.getElementById('emailFormContainer');
-
-// Append the form to the placeholder div
 formContainer.appendChild(form);
 
-const resultDiv = document.createElement('div');
-resultDiv.id = 'result';
-document.body.appendChild(resultDiv);
+// Get the result div by its ID
+const resultDiv = document.getElementById('resultContainer');
 
+// Add an event listener for form submission
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
+  // Get the values from the form fields
   const company = document.getElementById('company').value;
   const product = document.getElementById('product').value;
   const tone = document.getElementById('tone').value;
 
+  // Construct the prompt for the API
   const prompt = `Write a cold email to ${company} introducing ${product}. The tone should be ${tone}.`;
 
+  // Prepare the message for the OpenAI API
+  const messages = [
+    {
+      "role": "user",
+      "content": prompt
+    }
+  ];
+
   try {
+    // Make the API request to OpenAI
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}` // Uses the apiKey variable
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        prompt: prompt,
+        model: "gpt-4o-mini", // Specify the model
+        messages: messages,
         max_tokens: 200,
         n: 1,
         stop: null,
@@ -80,15 +93,16 @@ form.addEventListener('submit', async (event) => {
       })
     });
 
+    // Process the response
     const data = await response.json();
     if (data.choices && data.choices.length > 0) {
-        const emailContent = data.choices[0].text;
-        document.getElementById('result').textContent = emailContent;
-      } else {
-        document.getElementById('result').textContent = "No email generated. Please check your input or API key.";
-      }
-    } catch (error) {
+      const emailContent = data.choices[0].message.content;
+      resultDiv.textContent = emailContent;
+    } else {
+      resultDiv.textContent = "No email generated. Please check your input or API key.";
+    }
+  } catch (error) {
     console.error('Error:', error);
-    document.getElementById('result').textContent = "An error occurred. Please try again later.";
+    resultDiv.textContent = "An error occurred. Please try again later.";
   }
 });
