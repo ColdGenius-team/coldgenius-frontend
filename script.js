@@ -1,4 +1,4 @@
-const mySecret = process.env['API_KEY'] // Access API key from Replit Secrets
+const apiKey = "YOUR_API_KEY_HERE"; // Placeholder - Netlify will replace this during deployment
 const apiUrl = "https://api.openai.com/v1/engines/text-davinci-003/completions"; // Use the appropriate endpoint
 
 const form = document.createElement('form');
@@ -65,7 +65,7 @@ form.addEventListener('submit', async (event) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${apiKey}` // Uses the apiKey variable
       },
       body: JSON.stringify({
         prompt: prompt,
