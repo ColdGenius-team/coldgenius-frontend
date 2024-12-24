@@ -1,4 +1,4 @@
-const apiKey = "YOUR_API_KEY_HERE"; // Placeholder - Netlify will replace this during deployment
+const apiKey = "YOUR_OPENAI_API_KEY_HERE"; // Placeholder - Netlify will replace this during deployment
 const apiUrl = "https://api.openai.com/v1/chat/completions"; // Updated API endpoint
 
 // Create the form element
@@ -54,55 +54,67 @@ formContainer.appendChild(form);
 
 // Get the result div by its ID
 const resultDiv = document.getElementById('resultContainer');
+const submitButton = document.querySelector('#emailForm button[type="submit"]'); // Get the button
 
 // Add an event listener for form submission
 form.addEventListener('submit', async (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  // Get the values from the form fields
-  const company = document.getElementById('company').value;
-  const product = document.getElementById('product').value;
-  const tone = document.getElementById('tone').value;
+    // Disable the button and show loading state
+    submitButton.disabled = true;
+    submitButton.textContent = 'Generating...';
 
-  // Construct the prompt for the API
-  const prompt = `Write a cold email to ${company} introducing ${product}. The tone should be ${tone}.`;
+    // ... (Get form values - code is correct) ...
 
-  // Prepare the message for the OpenAI API
-  const messages = [
-    {
-      "role": "user",
-      "content": prompt
+    // Construct the prompt for the API
+    const prompt = `Write a cold email to ${company} introducing ${product}. The tone should be ${tone}.`;
+
+    // Prepare the message for the OpenAI API
+    const messages = [
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ];
+
+    try {
+        // Make the API request to OpenAI
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: "gpt-4o", // Correct model name
+                messages: messages,
+                max_tokens: 200,
+                n: 1,
+                stop: null,
+                temperature: 0.7
+            })
+        });
+
+        // Handle HTTP errors
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error.message || `HTTP error! status: ${response.status}`);
+        }
+
+        // Process the response
+        const data = await response.json();
+        if (data.choices && data.choices.length > 0) {
+            const emailContent = data.choices[0].message.content;
+            resultDiv.textContent = emailContent;
+        } else {
+            resultDiv.textContent = "No email generated. Please check your input.";
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        resultDiv.textContent = `An error occurred: ${error.message}`;
+    } finally {
+        // Re-enable the button and reset text
+        submitButton.disabled = false;
+        submitButton.textContent = 'Generate Email';
     }
-  ];
-
-  try {
-    // Make the API request to OpenAI
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini", // Specify the model
-        messages: messages,
-        max_tokens: 200,
-        n: 1,
-        stop: null,
-        temperature: 0.7
-      })
-    });
-
-    // Process the response
-    const data = await response.json();
-    if (data.choices && data.choices.length > 0) {
-      const emailContent = data.choices[0].message.content;
-      resultDiv.textContent = emailContent;
-    } else {
-      resultDiv.textContent = "No email generated. Please check your input or API key.";
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    resultDiv.textContent = "An error occurred. Please try again later.";
-  }
 });
